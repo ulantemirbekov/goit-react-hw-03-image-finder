@@ -1,8 +1,10 @@
 import { Component } from 'react';
+import Api from './Api/Api';
 import Searchbar from './Components/Searchbar/Searchbar';
 import ImageGallery from './Components/ImageGallery/ImageGallery';
 import Button from './Components/Button/Button';
-import Api from './Api/Api';
+import Modal from './Components/Modal/Modal';
+import Loader from './Components/Loader/Loader';
 import styles from './App.module.css';
 
 
@@ -13,16 +15,16 @@ class App extends Component {
     currentPage: 1,
     searchQuery: '',
     isLoading: false,
-    error: null
+    error: null,
+    largeImageURL: '',
+    showModal: false
   };
-
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.searchQuery !== this.state.searchQuery) {
       this.fetchPhotos();
     }
   };
-
 
   onChangeQuery = (query) => {
     this.setState({
@@ -32,7 +34,6 @@ class App extends Component {
       error: null
     });
   };
-
 
   fetchPhotos = () => {
     const { currentPage, searchQuery } = this.state;
@@ -51,13 +52,27 @@ class App extends Component {
         }));
       })
       .catch(error => this.setState({ error }))
-      .finally(() => this.setState({ isLoading: false }));
+      .finally(() => {
+        this.setState({ isLoading: false });
+
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: 'smooth',
+        });
+
+      });
   };
 
+  toggleModal = photo => {
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
+      largeImageURL: photo
+    }));
+  };
 
   render() {
 
-    const { photos, isLoading, error } = this.state;
+    const { photos, isLoading, error, largeImageURL, showModal } = this.state;
 
     return (
       <div className={styles.App}>
@@ -65,11 +80,14 @@ class App extends Component {
 
         <Searchbar onSubmit={this.onChangeQuery} />
 
-        {isLoading && <h2>Loading...</h2>}
+        {isLoading && <Loader />}
 
-        <ImageGallery photos={photos} />
+        <ImageGallery photos={photos} onClick={this.toggleModal} />
 
         {photos.length > 0 && <Button onClick={this.fetchPhotos} />}
+
+        {showModal && (<Modal largeImageURL={largeImageURL} closeModal={this.toggleModal} />)}
+
       </div>
     )
   }
