@@ -1,14 +1,22 @@
 import styles from './ImageGalleryItem.module.css';
 
-const ImageGalleryItem = ({ photo }) => {
+const ImageGalleryItem = ({ photo, onClick }) => {
 
-    // largeImageURL
-
-    const { webformatURL, tags } = photo;
+    const { webformatURL, tags, largeImageURL } = photo;
 
     return (
         <li className={styles.ImageGalleryItem}>
-            <img src={webformatURL} alt={tags} className={styles.ImageGalleryItem_image} />
+            <img
+                className={styles.ImageGalleryItem_image}
+                src={webformatURL}
+                alt={tags}
+                onClick={() => onClick(largeImageURL)}
+
+            // src={src}
+            // alt={alt}
+            // className={styles.ImageGalleryItem_image}
+            // onClick={() => onClick(source)}
+            />
         </li>
     )
 };
